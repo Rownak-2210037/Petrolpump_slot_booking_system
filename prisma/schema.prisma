@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String?
+  email     String?
+  role      String    @default("DRIVER")
+  createdAt DateTime  @default(now())
+  clerkId   String    @unique
+  bookings  Booking[]
+  stations  Station[] @relation("AdminStations")
+}
+
+model Station {
+  id        String    @id @default(uuid())
+  name      String
+  address   String?
+  latitude  Float?
+  longitude Float?
+  capacity  Int       @default(1)
+  createdAt DateTime  @default(now())
+  bookings  Booking[]
+  admins    User[]    @relation("AdminStations")
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  userId    String
+  stationId String
+  slotTime  DateTime
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  station   Station  @relation(fields: [stationId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([stationId, slotTime])
+}
