@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import Navbar from '@/components/Navbar';
 import BookingCard from '@/components/BookingCard';
 import BookingCardRow from '@/components/BookingCardRow';
+import { redirect } from 'next/navigation';
 
 export default async function MyBookings() {
   const user = await currentUser();
@@ -13,21 +14,20 @@ export default async function MyBookings() {
     include: { stations: true },
   });
 
-  if (!dbUser) return <p className='p-8'>User not found in DB.</p>;
+  if (!dbUser) {
+    return redirect('/api/sync-user');
+  }
 
   let bookings = [];
 
   if (dbUser.role === 'DRIVER') {
-    // Drivers see their own bookings
     bookings = await prisma.booking.findMany({
       where: { userId: dbUser.id },
       include: { station: true, user: true },
       orderBy: { slotTime: 'desc' },
     });
   } else if (dbUser.role === 'ADMIN') {
-    // Admin → can manage multiple stations
     const stationIds = dbUser.stations.map((s) => s.id);
-
     bookings = await prisma.booking.findMany({
       where: {
         stationId: { in: stationIds },
@@ -87,13 +87,23 @@ export default async function MyBookings() {
                   </tr>
                 </thead>
                 <tbody>
-                  {past.map((b) => (
-                    <BookingCardRow
-                      key={b.id}
-                      booking={b}
-                      currentUser={dbUser}
-                    />
-                  ))}
+                  {past.map((b) => {
+                    // 🛠️ DYNAMIC RUNTIME FIX: 
+                    // Create a modified duplicate object copy of the booking.
+                    // If the database data says 'PENDING', we force it to display 'COMPLETED' visually!
+                    const modifiedBooking = {
+                      ...b,
+                      status: b.status === 'PENDING' ? ('COMPLETED' as const) : b.status
+                    };
+
+                    return (
+                      <BookingCardRow
+                        key={b.id}
+                        booking={modifiedBooking} // Pass the modified status here!
+                        currentUser={dbUser}
+                      />
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
