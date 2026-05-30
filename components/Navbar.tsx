@@ -49,8 +49,8 @@ export default function Navbar() {
               Home
             </Link>
 
-            {/* 🛠️ ROLE-BASED LINKS: Accessible by DRIVER OR ADMIN for perfect testing layout */}
-            {(userRole === 'DRIVER' || userRole === 'ADMIN') && (
+            {/* 🚗 DRIVER ONLY LINKS: Hide these completely from ADMINS to stop history leaks */}
+            {userRole === 'DRIVER' && (
               <>
                 <Link
                   href='/stations'
@@ -67,9 +67,15 @@ export default function Navbar() {
               </>
             )}
 
-            {/* Admin Specific Features panel */}
+            {/* ⛽ ADMIN ONLY LINKS: Keep your managers completely inside their secure dashboard panel */}
             {userRole === 'ADMIN' && (
               <>
+                <Link
+                  href='/admin/dashboard'
+                  className='block px-5 py-2 text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition'
+                >
+                  📊 Admin Dashboard
+                </Link>
                 <Link
                   href='/admin/create-station'
                   className='block px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition'
@@ -119,7 +125,8 @@ export default function Navbar() {
             Home
           </Link>
 
-          {(userRole === 'DRIVER' || userRole === 'ADMIN') && (
+          {/* 🚗 Mobile Driver View Separation */}
+          {userRole === 'DRIVER' && (
             <>
               <Link
                 href='/stations'
@@ -136,13 +143,22 @@ export default function Navbar() {
             </>
           )}
 
+          {/* ⛽ Mobile Admin View Separation */}
           {userRole === 'ADMIN' && (
-            <Link
-              href='/admin/create-station'
-              className='block px-5 py-3 bg-blue-600 text-white rounded-lg transition'
-            >
-              Create Station
-            </Link>
+            <>
+              <Link
+                href='/admin/dashboard'
+                className='block px-5 py-3 rounded-lg bg-blue-100 text-blue-700 font-bold transition'
+              >
+                📊 Admin Dashboard
+              </Link>
+              <Link
+                href='/admin/create-station'
+                className='block px-5 py-3 bg-blue-600 text-white rounded-lg transition'
+              >
+                ➕ Create Station
+              </Link>
+            </>
           )}
 
           {/* Auth */}

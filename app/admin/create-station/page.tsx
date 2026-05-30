@@ -79,7 +79,7 @@ export default function CreateStation() {
             </div>
 
             <div>
-              <label className='block mb-2 font-medium'>Capacity</label>
+              <label className='block mb-2 font-medium'>Capacity per slot</label>
               <input
                 type='number'
                 placeholder='Capacity'
