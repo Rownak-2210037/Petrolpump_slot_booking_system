@@ -3,4 +3,6 @@ export interface Station {
   name: string;
   address: string;
   capacity: number;
+  latitude: number;  
+  longitude: number;
 }

@@ -6,7 +6,11 @@ import BookingCardRow from '@/components/BookingCardRow';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
-// 🚀 force dynamic execution to bypass cached reads
+// 🎯 FIX: Import NearbyStationsMap as a normal component here. 
+// The client component itself will handle the lazy loading internally!
+import NearbyStationsMap from '@/components/NearbyStationsMap';
+
+// 🚀 Force dynamic execution to bypass cached reads
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -21,9 +25,9 @@ export default async function MyBookings({ searchParams }: PageProps) {
   // 1. Resolve server query parameters safely
   const resolvedParams = await searchParams;
   const currentPage = parseInt(resolvedParams.page || '1', 10);
-  const itemsPerPage = 5; // 🎯 Displaying exactly 5 rows per page split
+  const itemsPerPage = 5; // Displaying exactly 5 rows per page split
 
-  // 2. Fetch user profile record configurations
+  // 2. Fetch user profile record configurations from Neon Postgres
   const dbUser = await prisma.user.findUnique({
     where: { clerkId: user.id },
     include: { stations: true },
@@ -78,7 +82,12 @@ export default async function MyBookings({ searchParams }: PageProps) {
     <div className='min-h-screen bg-gray-100'>
       <Navbar />
       <main className='container mx-auto py-8 px-4'>
-        <h1 className='text-3xl font-bold mb-6 text-gray-800'>My Bookings Dashboard</h1>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+          <h1 className='text-3xl font-bold text-gray-800'>My Bookings Dashboard</h1>
+        </div>
+
+        {/* 🎯 PROXIMITY GEOLOCATION LAYER INJECTION */}
+        {dbUser.role === 'DRIVER' && <NearbyStationsMap />}
 
         {/* 🚨 Upcoming Bookings Section */}
         <section className='mb-8'>
@@ -121,7 +130,6 @@ export default async function MyBookings({ searchParams }: PageProps) {
                   </thead>
                   <tbody className='divide-y divide-gray-100 text-sm text-gray-600'>
                     {paginatedPastBookings.map((b) => {
-                      // Visual backup injector to clean raw pending strings 
                       const modifiedBooking = {
                         ...b,
                         status: b.status === 'PENDING' ? ('COMPLETED' as const) : b.status
@@ -139,7 +147,7 @@ export default async function MyBookings({ searchParams }: PageProps) {
                 </table>
               </div>
 
-              {/* 🎯 BEAUTIFUL COMPONENT PAGINATION TOOLBAR CONTROLS */}
+              {/* 🎯 PAGINATION TOOLBAR CONTROLS */}
               <div className='flex justify-between items-center bg-white px-4 py-3 rounded-xl border border-gray-200 text-xs font-semibold shadow-sm text-gray-600'>
                 {currentPage > 1 ? (
                   <Link
