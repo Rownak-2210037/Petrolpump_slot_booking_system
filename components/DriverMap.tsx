@@ -13,7 +13,7 @@ const defaultIcon = L.icon({
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
-});
+})
 
 interface DriverMapProps {
   stations: Station[];
@@ -68,12 +68,14 @@ export default function DriverMap({ stations, userCoords }: DriverMapProps) {
                   </div>
 
                   {/* ⚡ ACTION LINK: Clicking this redirects the driver to the booking form */}
-                  <a
-                    href={`/stations/${station.id}`}
-                    className="block w-full text-center px-2 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg no-underline transition-colors shadow-sm"
-                  >
-                    Select & Book Slot ➔
-                  </a>
+                  {/* 🎯 FIXED: Update your <a> anchor tag on line 74 with these explicit styles */}
+<a 
+  href={`/stations/${station.id}`} 
+  className="block text-center w-full px-4 py-2 mt-2 bg-blue-600 text-white font-bold rounded-lg shadow hover:bg-blue-700 transition duration-200 no-underline"
+  style={{ color: '#ffffff' }} /* 🔥 Ultimate bulletproof safety override for Leaflet */
+>
+  Select & Book Slot ➔
+</a>
                 </div>
               </Popup>
             </Marker>
