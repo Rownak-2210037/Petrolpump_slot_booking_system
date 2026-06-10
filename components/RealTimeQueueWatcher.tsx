@@ -10,7 +10,7 @@ export default function RealTimeQueueWatcher() {
   const [targetStation, setTargetStation] = useState('');
   const speakCount = useRef(0);
 
-  // 🔊 ২ বার স্বয়ংক্রিয়ভাবে কথা বলার কোর ফাংশন
+  
   function triggerTwiceVoiceAnnouncement(stationName: string, bookingId: string) {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
@@ -18,8 +18,8 @@ export default function RealTimeQueueWatcher() {
       window.speechSynthesis.cancel(); 
       speakCount.current = 0; 
 
-      // 🎯 এই একই মেসেজটি আমরা নিচে স্ক্রিনেও ডিসপ্লে করব
-      const message = `Hello driver, your slot is booked at ${stationName}, and you have to go to the station within 5 minutes.`;
+      
+      const message = `Hello driver, your slot is booked at ${stationName}, and you have to go to the station within 1 minutes.`;
       
       const speakSequence = () => {
         if (speakCount.current < 2) {
@@ -38,7 +38,7 @@ export default function RealTimeQueueWatcher() {
               console.log("🎯 [Audio Engine] 2 loops completed. Automatically closing alert.");
               setModalOpen(false);
               
-              // 💾 PERSISTENT LOCK: ব্রাউজারের মেমোরিতে এই বুকিং আইডিটি লক করে দিন যেন রিলোড দিলে আর না বাজে
+              // 💾 PERSISTENT LOCK: 
               localStorage.setItem(`alert_dismissed_${bookingId}`, 'true');
             }
           };
@@ -79,10 +79,10 @@ export default function RealTimeQueueWatcher() {
 
             console.log(`🔍 [Watcher] Station: ${booking.station.name} | Minutes Left: ${timeDifferenceInMinutes.toFixed(2)}`);
 
-            // 🎯 ৫ মিনিটের উইন্ডো চেক (৪ থেকে ৫.৫ মিনিটের মধ্যে)
-            if (timeDifferenceInMinutes >= 4.0 && timeDifferenceInMinutes <= 5.5) {
+            
+            if (timeDifferenceInMinutes >= 0.5 && timeDifferenceInMinutes <= 1.5) {
               
-              // লোকালস্টোরেজ চেক: এই বুকিংয়ের অ্যালার্ট কি আগে বাজানো হয়েছিল?
+              
               const isAlreadyPlayed = localStorage.getItem(`alert_dismissed_${booking.id}`);
               if (isAlreadyPlayed === 'true') {
                 return; 
@@ -124,11 +124,11 @@ export default function RealTimeQueueWatcher() {
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Slot Notification</h2>
             
-            {/* 🎯 এখানে হুবহু সেই ইংলিশ অডিও মেসেজটি স্ক্রিনেও সুন্দর টেক্সট আকারে দেখাবে */}
+            {/* 🎯  */}
             <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-5 text-left shadow-inner">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Live Audio Script:</span>
               <p className="text-slate-700 font-medium text-base italic leading-relaxed">
-                "Hello driver, your slot is booked at <span className="text-blue-600 font-bold not-italic">{targetStation}</span>, and you have to go to the station within 5 minutes."
+                "Hello driver, your slot is booked at <span className="text-blue-600 font-bold not-italic">{targetStation}</span>, and you have to go to the station within 1 minutes."
               </p>
             </div>
 
